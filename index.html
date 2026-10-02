@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>わせがく専用 AI ART DIRECTOR</title>
+<style>
+:root{--g:#176B45;--d:#202A25;--r:#C82132;--bg:#f4f6f4;--line:#dfe5e1;--muted:#66716b;--white:#fff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--d);font-family:system-ui,-apple-system,"Noto Sans JP","Yu Gothic",sans-serif}
+header{background:var(--d);color:#fff;padding:42px 6vw 48px}header small{letter-spacing:.16em;opacity:.65}h1{font-size:clamp(32px,5vw,60px);line-height:1.05;margin:10px 0 14px;letter-spacing:-.04em}.lead{max-width:780px;color:#dce4df;margin:0}
+.wrap{max-width:1120px;margin:auto;padding:28px 18px 70px}.screen{display:none}.screen.active{display:block}
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:25px;box-shadow:0 10px 30px rgba(32,42,37,.06)}
+h2{font-size:21px;margin:0 0 8px}.sub{font-size:12px;color:var(--muted);margin:0 0 20px}
+.modes{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:20px}.mode{padding:18px 10px;border:1px solid var(--line);border-radius:14px;background:#fff;text-align:center;cursor:pointer;font-weight:800}.mode:hover,.mode.selected{border-color:var(--g);background:#f0f6f2;box-shadow:inset 0 0 0 1px var(--g)}.mode small{display:block;color:var(--muted);font-weight:500;margin-top:5px}
+label{display:block;font-size:13px;font-weight:800;margin:16px 0 6px}input,textarea,select{width:100%;border:1px solid #d3dbd6;border-radius:10px;padding:11px 12px;font:inherit;color:var(--d);background:#fff}textarea{min-height:82px;resize:vertical}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.choices{display:flex;flex-wrap:wrap;gap:7px}.choice{border:1px solid var(--line);border-radius:999px;padding:7px 10px;font-size:12px;cursor:pointer}.choice input{width:auto;margin-right:4px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:22px}button{border:0;border-radius:10px;padding:12px 16px;font-weight:850;cursor:pointer}.primary{background:var(--g);color:#fff}.dark{background:var(--d);color:#fff}.light{background:#edf1ee;color:var(--d)}.red{background:var(--r);color:#fff}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}.concept{border:1px solid var(--line);border-radius:15px;padding:18px;cursor:pointer;background:#fff}.concept.selected{outline:2px solid var(--g);background:#f5faf7}.tag{font-size:10px;font-weight:800;letter-spacing:.08em;color:var(--g)}.concept h3{font-size:16px;margin:7px 0}.concept p{font-size:12px;color:var(--muted);margin:0;line-height:1.7}
+.spec{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:15px}.spec div{background:#f5f7f5;border-radius:10px;padding:12px;font-size:12px}.spec b{display:block;font-size:11px;color:var(--muted);margin-bottom:3px}
+.status{padding:13px;border-radius:12px;background:#f0f5f2;font-size:13px;margin-top:14px}.audit{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:14px}.audit div{border:1px solid var(--line);border-radius:10px;padding:12px;font-size:12px}.ok{color:var(--g);font-weight:850}.warn{color:var(--r);font-weight:850}
+.prompt{white-space:pre-wrap;background:#111714;color:#e9efeb;border-radius:12px;padding:16px;font-size:11px;line-height:1.7;max-height:430px;overflow:auto;margin-top:12px}.note{font-size:11px;color:var(--muted);line-height:1.7}.step{display:flex;gap:8px;align-items:center;font-size:12px;color:var(--muted);margin:15px 0}.step span{width:24px;height:24px;border-radius:50%;background:var(--g);color:#fff;display:grid;place-items:center;font-weight:800}
+@media(max-width:900px){.modes{grid-template-columns:repeat(2,1fr)}.grid,.spec,.row{grid-template-columns:1fr}.audit{grid-template-columns:1fr}}
+
+.logo-wrap{display:flex;align-items:center;margin-bottom:18px}
+.wasegaku-logo{width:92px;height:92px;object-fit:contain;border-radius:16px;background:#fff;display:block}
+@media(max-width:600px){.wasegaku-logo{width:72px;height:72px}}
+</style>
+</head>
+<body>
+<header><div class="logo-wrap"><img class="wasegaku-logo" src="assets/wasegaku-logo.png" alt="わせがく高等学校 ロゴ"></div><small>WASEGAKU VISUAL DESIGN SYSTEM</small>
+<h1>わせがく専用<br>AI ART DIRECTOR</h1>
+<p class="lead">案件を入力する。方向性を選ぶ。最終プロンプトをつくる。<br>「生成AIっぽい広報物」ではなく、案件ごとに理由のある広報物をつくるための専用ディレクションシステム。</p>
+</header>
+
+<main class="wrap">
+<section id="s1" class="screen active">
+<div class="card">
+<h2>01｜何を作りますか？</h2><p class="sub">最初に媒体だけ選んでください。詳しいデザイン指定は不要です。</p>
+<div class="modes">
+<div class="mode" onclick="chooseMode(this,'ポスター')">ポスター<small>学校・募集</small></div>
+<div class="mode" onclick="chooseMode(this,'イベント')">イベント<small>説明会・相談会</small></div>
+<div class="mode" onclick="chooseMode(this,'SNS / WEB')">SNS / WEB<small>投稿・バナー</small></div>
+<div class="mode" onclick="chooseMode(this,'インフォグラフィック')">インフォ<small>情報整理</small></div>
+<div class="mode" onclick="chooseMode(this,'記念ビジュアル')">記念<small>周年・贈呈</small></div>
+</div>
+<div class="actions"><button class="primary" onclick="next(2)">次へ</button></div>
+</div>
+</section>
+
+<section id="s2" class="screen">
+<div class="card">
+<h2>02｜案件を5つだけ入力</h2><p class="sub">全部を詳しく考える必要はありません。AIが不足部分を整理します。</p>
+<label>案件名</label><input id="name" placeholder="例：多古本校 6月学校説明会">
+<label>誰に、何をしてほしい？</label><textarea id="goal" placeholder="例：中学生と保護者に学校説明会へ来てもらいたい"></textarea>
+<label>必ず入れたい情報</label><textarea id="facts" placeholder="例：6月27日（土）10:00〜12:00／多古本校／学校説明・相談会"></textarea>
+<label>今回、何を「わせがくらしさ」として見せたい？</label>
+<div class="choices">
+<label class="choice"><input type="checkbox" value="自由">自由</label><label class="choice"><input type="checkbox" value="個性">個性</label><label class="choice"><input type="checkbox" value="夢育">夢育</label><label class="choice"><input type="checkbox" value="自分のペース">自分のペース</label><label class="choice"><input type="checkbox" value="安心">安心</label><label class="choice"><input type="checkbox" value="人とのつながり">人とのつながり</label><label class="choice"><input type="checkbox" value="今を大切にする">今を大切にする</label>
+</div>
+<label>「こういうのは嫌だ」があれば一言</label><input id="avoid" placeholder="例：ありがちな学校広告、派手なAI画像、桜、虹、青空＋校舎">
+<label>サイズ・アスペクト比</label>
+<select id="ratio"><option>A4縦（1:√2）</option><option>A4横（√2:1）</option><option>A3縦（1:√2）</option><option>A3横（√2:1）</option><option>16:9</option><option>9:16</option><option>1:1</option></select>
+<div class="actions"><button class="light" onclick="next(1)">戻る</button><button class="primary" onclick="makeDirections()">デザインを考える</button></div>
+</div>
+</section>
+
+<section id="s3" class="screen">
+<div class="card">
+<h2>03｜デザイン方向を選ぶ</h2><p class="sub">AIが案件の内容から3方向を設計します。選んだ方向で制作工程へ進みます。</p>
+<div id="concepts" class="grid"></div>
+<div class="actions"><button class="light" onclick="next(2)">戻る</button><button class="primary" onclick="next(4)">この方向で制作仕様を確定</button></div>
+</div>
+</section>
+
+<section id="s4" class="screen">
+<div class="card">
+<h2>04｜制作仕様を確定</h2><p class="sub">ここは確認画面です。基本的に修正は不要です。</p>
+<div id="spec"></div>
+<div class="status"><b>WASEGAKU LOGO：必ず指定ロゴを使用</b><br>ロゴの改変・再描画・代替は禁止。<br><br><b>WASEGAKU COLOR SYSTEM</b><br>GREEN #176B45＝重要情報・主要視線誘導 ／ DARK #202A25＝文字・輪郭 ／ RED #C82132＝限定アクセント<br><b>この3色以外を新しい主要色として追加しない。</b></div>
+<div class="actions"><button class="light" onclick="next(3)">方向を選び直す</button><button class="primary" onclick="buildPrompt();next(5)">制作開始</button></div>
+</div>
+</section>
+
+<section id="s5" class="screen">
+<div class="card">
+<h2>05｜最終生成物：画像生成プロンプト</h2><p class="sub">このディレクターの最終成果物は、画像そのものではなく「完成版プロンプト」です。生成AIへそのまま渡せる状態にします。</p>
+<div class="step"><span>1</span>アートディレクション確定</div>
+<div class="step"><span>2</span>画像生成用プロンプト生成</div>
+<div class="step"><span>3</span>生成AIへプロンプトを渡して画像制作</div>
+<div id="prompt" class="prompt"></div>
+<div class="actions"><button class="primary" onclick="copyPrompt()">最終プロンプトをコピー</button><button class="dark" onclick="downloadPrompt()">プロンプトを保存</button><button class="light" onclick="next(4)">戻る</button></div>
+<p class="note">Google Sites上では、このページから直接画像生成を実行しません。ここで完成版プロンプトを作り、コピーしてChatGPT等の画像生成AIへ渡します。ロゴは必ず指定の「わせがくロゴ」を使用してください。</p>
+</div>
+</section>
+
+</main>
+
+<script>
+let mode='',selected=0,directions=[];
+const $=id=>document.getElementById(id);
+function next(n){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));$('s'+n).classList.add('active');window.scrollTo({top:0,behavior:'smooth'})}
+function chooseMode(el,v){mode=v;document.querySelectorAll('.mode').forEach(x=>x.classList.remove('selected'));el.classList.add('selected')}
+function checked(){return [...document.querySelectorAll('.choices input:checked')].map(x=>x.value)}
+function makeDirections(){
+ if(!mode){alert('媒体を1つ選んでください。');next(1);return}
+ const n=$('name').value.trim()||'今回の広報物',g=$('goal').value.trim()||'内容を分かりやすく伝える',f=$('facts').value.trim()||'入力された事実のみ',v=checked().join('・')||'生徒を中心にした自然な表現',a=$('avoid').value.trim()||'一般的なAI学校広告';
+ directions=[
+ ['A｜DOCUMENTARY','その場にいた瞬間','広告写真ではなく、実際の学校生活の一場面として見せる。自然な動き、視線、距離感、余白を中心に設計する。'],
+ ['B｜EDITORIAL','言葉と余白','写真や装飾を増やさず、強い一文と端正な文字組み、意味のある余白で印象をつくる。'],
+ ['C｜UNEXPECTED','定番ではない視点','校舎・集合写真・正面笑顔に頼らず、手元、道具、部分、空間、視線などから学校を想像させる。']
+ ];
+ $('concepts').innerHTML=directions.map((d,i)=>`<div class="concept ${i===0?'selected':''}" onclick="selectDir(${i})" id="dir${i}"><span class="tag">${d[0]}</span><h3>${d[1]}</h3><p>${d[2]}</p></div>`).join('');
+ selected=0;next(3);
+}
+function selectDir(i){selected=i;document.querySelectorAll('.concept').forEach(x=>x.classList.remove('selected'));$('dir'+i).classList.add('selected')}
+function specData(){
+ const d=directions[selected];return {name:$('name').value.trim()||'今回の広報物',goal:$('goal').value.trim()||'内容を分かりやすく伝える',facts:$('facts').value.trim()||'入力された事実のみ',values:checked().join('・')||'生徒を中心にした自然な表現',avoid:$('avoid').value.trim()||'一般的なAI学校広告',ratio:$('ratio').value,mode,d}
+}
+function showSpec(){
+ const x=specData();$('spec').innerHTML=`<div class="spec">
+<div><b>案件</b>${x.name}</div><div><b>媒体</b>${x.mode}</div>
+<div><b>サイズ</b>${x.ratio}</div><div><b>コンセプト</b>${x.d[1]}</div>
+<div><b>目的</b>${x.goal}</div><div><b>わせがくらしさ</b>${x.values}</div>
+</div><label style="margin-top:18px">必須情報</label><div class="status">${x.facts}</div>`;
+}
+const oldNext=next;
+next=function(n){if(n===4)showSpec();oldNext(n)}
+function buildPrompt(){
+ const x=specData(),d=x.d;
+ $('prompt').textContent=`【WASEGAKU IMAGE DIRECTOR｜FINAL】
+
+制作物：${x.name}
+媒体：${x.mode}
+サイズ：${x.ratio}
+目的・対象：${x.goal}
+必須掲載情報：${x.facts}
+わせがくらしさ：${x.values}
+避けたい表現：${x.avoid}
+
+【採用コンセプト】
+${d[1]}
+${d[2]}
+
+【絶対条件｜WASEGAKU COLOR SYSTEM】
+主要色はGREEN #176B45、DARK #202A25、RED #C82132の3色のみ。
+GREEN：重要情報・強調・主要な視線誘導。
+DARK：基本文字・輪郭・基本要素。
+RED：限定的なアクセント。
+これ以外の色を新しい主要色として追加しない。
+元のカラーバランス、色の役割、色数、赤の使用量を変更しない。
+赤を主要背景色にしない。緑を主要な情報強調に使う。
+
+【AIテンプレート回避】
+一般的な学校広告、通信制高校広告、生成AIポスターの平均値に収束しない。
+青空＋校舎＋笑顔、桜、虹、鳥、星、発光粒子、未来都市、ホログラム、AI脳、巨大数字、巨大英単語、意味のない図形、過剰な3D、過剰なアイコン、過剰なグラデーションを安易に使わない。
+抽象語を典型記号に置き換えない。
+「なぜこのビジュアルが必要なのか」を案件情報から説明できる構成にする。
+
+【人物・写真】
+広告モデルのような完璧な人物を避け、実在する学校生活の自然な一瞬として表現する。
+不自然な笑顔、過度なポーズ、過剰な演出を避ける。
+人物が主役でない場合は、手元、道具、空間、部分、後ろ姿なども積極的に検討する。
+
+【レイアウト】
+視線の入口→主メッセージ→補足情報→CTAの順で情報階層を設計。
+余白を意味なく埋めない。
+中央揃え・均等配置・カードUIを自動的な既定値にしない。
+装飾は理由が説明できるものだけ。
+
+【事実管理】
+入力されていない学校情報、施設、実績、制度、数字、人物属性を創作しない。
+必須情報は正確性を最優先。
+画像生成AIが文字を正確に描けない場合は、背景ビジュアルと文字レイヤーを分離する。
+
+【最終目的】
+「AIが作った学校ポスター」ではなく、
+「わせがくの広報担当者とアートディレクターが案件ごとに意図を持って設計した広報物」
+として成立させる。`;
+}
+function copyPrompt(){const t=$('prompt').textContent;if(!t){alert('先に制作を開始してください。');return}if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(t).then(()=>alert('画像生成プロンプトをコピーしました。')).catch(()=>fallback(t));else fallback(t)}
+function fallback(t){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();alert('画像生成プロンプトをコピーしました。')}
+function prepareGenerate(){buildPrompt();alert('画像生成用の最終指示を確定しました。このチャットで「この仕様で画像を生成して」と送れば、画像生成へ進められます。')}
+</script>
+</body>
+</html>
